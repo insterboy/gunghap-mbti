@@ -15,16 +15,24 @@ const MBTI_OPTIONS = [
   'ESTJ', 'ESFJ', 'ENFJ', 'ENTJ'
 ];
 
+interface UserFormState extends UserInfo {
+  year: string;
+  month: string;
+  day: string;
+}
+
 export const CompatibilityForm: React.FC<CompatibilityFormProps> = ({ onSubmit, isLoading }) => {
-  const [user1, setUser1] = useState<UserInfo>({ nickname: '', gender: '남성', birthdate: '', mbti: 'ENFP' });
-  const [user2, setUser2] = useState<UserInfo>({ nickname: '', gender: '여성', birthdate: '', mbti: 'INFJ' });
+  const [user1, setUser1] = useState<UserFormState>({ nickname: '', gender: '남성', birthdate: '', mbti: 'ENFP', year: '2000', month: '01', day: '01' });
+  const [user2, setUser2] = useState<UserFormState>({ nickname: '', gender: '여성', birthdate: '', mbti: 'INFJ', year: '2000', month: '01', day: '01' });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(user1, user2);
+    const u1: UserInfo = { ...user1, birthdate: `${user1.year}-${user1.month.padStart(2, '0')}-${user1.day.padStart(2, '0')}` };
+    const u2: UserInfo = { ...user2, birthdate: `${user2.year}-${user2.month.padStart(2, '0')}-${user2.day.padStart(2, '0')}` };
+    onSubmit(u1, u2);
   };
 
-  const renderUserInput = (user: UserInfo, setUser: React.Dispatch<React.SetStateAction<UserInfo>>, title: string, isMe: boolean) => (
+  const renderUserInput = (user: UserFormState, setUser: React.Dispatch<React.SetStateAction<UserFormState>>, title: string, isMe: boolean) => (
     <div className={`p-6 border-4 border-brutal-black ${isMe ? 'bg-white' : 'bg-brutal-black text-white'} relative overflow-hidden`}>
       <div className={`absolute top-0 right-0 p-2 ${isMe ? 'bg-neon text-brutal-black' : 'bg-white text-brutal-black'} font-black text-[10px]`}>
         {isMe ? 'PERSON_01' : 'PERSON_02'}
@@ -42,7 +50,7 @@ export const CompatibilityForm: React.FC<CompatibilityFormProps> = ({ onSubmit, 
             type="text"
             value={user.nickname}
             onChange={(e) => setUser({ ...user, nickname: e.target.value })}
-            className={`w-full px-4 py-4 border-2 border-brutal-black focus:outline-none focus:ring-4 focus:ring-neon font-bold text-lg ${isMe ? 'bg-white text-brutal-black' : 'bg-white text-brutal-black'}`}
+            className={`w-full px-4 py-4 border-2 border-brutal-black focus:outline-none focus:ring-4 focus:ring-neon font-bold text-lg bg-white text-brutal-black`}
             placeholder="이름이 뭐야?"
             required
           />
@@ -74,14 +82,35 @@ export const CompatibilityForm: React.FC<CompatibilityFormProps> = ({ onSubmit, 
         </div>
 
         <div>
-          <label className={`block text-[10px] font-black uppercase mb-2 ${isMe ? 'text-gray-500' : 'text-gray-400'}`}>Birthdate</label>
-          <input
-            type="date"
-            value={user.birthdate}
-            onChange={(e) => setUser({ ...user, birthdate: e.target.value })}
-            className={`w-full px-4 py-4 border-2 border-brutal-black focus:outline-none focus:ring-4 focus:ring-neon font-bold text-lg bg-white text-brutal-black rounded-none`}
-            required
-          />
+          <label className={`block text-[10px] font-black uppercase mb-2 ${isMe ? 'text-gray-500' : 'text-gray-400'}`}>Birthdate (YYYY / MM / DD)</label>
+          <div className="grid grid-cols-3 gap-2">
+            <input
+              type="number"
+              value={user.year}
+              onChange={(e) => setUser({ ...user, year: e.target.value })}
+              className={`w-full px-2 py-4 border-2 border-brutal-black focus:outline-none focus:ring-2 focus:ring-neon font-bold text-base bg-white text-brutal-black rounded-none`}
+              placeholder="2000"
+              required
+            />
+            <input
+              type="number"
+              value={user.month}
+              onChange={(e) => setUser({ ...user, month: e.target.value })}
+              className={`w-full px-2 py-4 border-2 border-brutal-black focus:outline-none focus:ring-2 focus:ring-neon font-bold text-base bg-white text-brutal-black rounded-none`}
+              placeholder="01"
+              min="1" max="12"
+              required
+            />
+            <input
+              type="number"
+              value={user.day}
+              onChange={(e) => setUser({ ...user, day: e.target.value })}
+              className={`w-full px-2 py-4 border-2 border-brutal-black focus:outline-none focus:ring-2 focus:ring-neon font-bold text-base bg-white text-brutal-black rounded-none`}
+              placeholder="01"
+              min="1" max="31"
+              required
+            />
+          </div>
         </div>
       </div>
     </div>
