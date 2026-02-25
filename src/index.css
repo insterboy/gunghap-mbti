@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Anton", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --color-neon: #00FF00;
+  --color-brutal-black: #000000;
+  --color-gallery-white: #FFFFFF;
+}
+
+body {
+  @apply bg-gallery-white text-brutal-black font-body antialiased selection:bg-neon selection:text-brutal-black;
+}
+
+.brutal-border {
+  @apply border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
+}
+
+.brutal-border-hover {
+  @apply transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none;
+}
+
+.font-display {
+  @apply font-display uppercase tracking-tight;
+}
+
+.markdown-body h1 { @apply text-4xl font-display mb-6 uppercase; }
+.markdown-body h2 { @apply text-2xl font-display mb-4 mt-8 uppercase border-b-2 border-brutal-black inline-block; }
+.markdown-body p { @apply mb-4 leading-relaxed font-medium; }
+.markdown-body ul { @apply list-none pl-0 mb-6 space-y-2; }
+.markdown-body li { @apply flex items-start gap-2 before:content-['⚡'] before:mt-1; }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-gallery-white;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-brutal-black border-2 border-gallery-white;
+}
+
