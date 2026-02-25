@@ -3,109 +3,85 @@ import { CompatibilityForm } from './components/CompatibilityForm';
 import { CompatibilityResult } from './components/CompatibilityResult';
 import { analyzeLocally, UserInfo } from './services/localEngine';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Zap, Smartphone } from 'lucide-react';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Handle shared links
   useEffect(() => {
-    const path = window.location.pathname;
     const hash = window.location.hash;
-    const id = path.split('/').pop();
-
     if (hash.startsWith('#share=')) {
       try {
         const encodedData = hash.replace('#share=', '');
         const decodedData = JSON.parse(decodeURIComponent(atob(encodedData)));
         setResult(decodedData.analysis);
       } catch (err) {
-        console.error('Failed to decode share link', err);
+        console.error('Share link decode error', err);
       }
-    } else if (id && id.length > 20) { // Simple check for UUID
-      fetchResult(id);
     }
   }, []);
-
-  const fetchResult = async (id: string) => {
-    // API results are disabled for static hosting.
-    // Hash-based results will be handled by the useEffect above.
-    console.warn('Backend API results are disabled on static hosting.', id);
-  };
 
   const handleAnalyze = async (user1: UserInfo, user2: UserInfo) => {
     setIsLoading(true);
     setError(null);
 
-    // Simulate a short delay for "analysis feel"
-    setTimeout(async () => {
+    setTimeout(() => {
       try {
         const analysis = analyzeLocally(user1, user2);
-
-        // Encode data in URL hash for static hosting (GitHub Pages)
-        // This is the most reliable way for GitHub Pages as it doesn't require a server
         const data = btoa(encodeURIComponent(JSON.stringify({ analysis, user1, user2 })));
         window.location.hash = `share=${data}`;
-
         setResult(analysis);
       } catch (err) {
-        console.error(err);
-        setError('분석 중 오류가 발생했습니다. 다시 시도해주세요.');
+        setError('분석 오류! 다시 시도해봐.');
       } finally {
         setIsLoading(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
-    }, 800);
+    }, 1500);
   };
 
   const handleReset = () => {
     setResult(null);
-    setError(null);
     window.location.hash = '';
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="py-16 px-6 text-center space-y-6">
+    <div className="min-h-screen bg-white text-brutal-black font-sans selection:bg-neon overflow-x-hidden">
+      {/* Background Ornaments */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[5%] -left-10 w-40 h-40 border-4 border-brutal-black rotate-12 bg-neon/10" />
+        <div className="absolute bottom-[10%] -right-10 w-60 h-60 border-8 border-neon rounded-full opacity-20" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-2 bg-brutal-black/5 -rotate-45" />
+      </div>
+
+      <header className="relative z-10 pt-16 pb-12 px-6 text-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="inline-flex items-center gap-2 px-6 py-2 bg-neon text-brutal-black brutal-border font-display text-lg"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="inline-block bg-brutal-black text-neon px-4 py-1 mb-8 font-display text-sm tracking-[0.2em] uppercase brutal-border"
         >
-          <Sparkles className="w-5 h-5 fill-brutal-black" />
-          PREMIUM COMPATIBILITY
+          2026 DESTINY VER.
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-5xl md:text-9xl font-display leading-none text-brutal-black"
-        >
-          궁합 <span className="bg-neon px-4">컨설턴트</span>
-        </motion.h1>
+        <h1 className="text-7xl md:text-9xl font-display leading-[0.7] mb-6 tracking-tighter">
+          궁합 <br />
+          <span className="bg-neon px-3 inline-block -rotate-2 brutal-border mt-2">컨설턴트</span>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-brutal-black max-w-lg mx-auto text-xl font-bold uppercase tracking-tight"
-        >
-          MBTI 심리학 X 사주명리학<br />
-          <span className="text-sm font-mono bg-brutal-black text-white px-2 py-1">EST. 2026 // DESTINY ANALYZER</span>
-        </motion.p>
+        <p className="font-mono text-[10px] font-black uppercase tracking-widest opacity-40">
+          MBTI Psychology x Saju Mythology // Fully Static & Private
+        </p>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-grow container mx-auto px-4 pb-24 max-w-md">
+      <main className="relative z-10 container mx-auto px-4 pb-32 max-w-lg">
         <AnimatePresence mode="wait">
           {error && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="max-w-md mx-auto mb-8 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-center text-sm font-medium"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-red-500 text-white p-4 brutal-border mb-8 font-bold text-center"
             >
               {error}
             </motion.div>
@@ -114,18 +90,24 @@ export default function App() {
           {!result ? (
             <motion.div
               key="form"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -100 }}
             >
+              <div className="flex justify-center mb-8">
+                <div className="bg-brutal-black text-white px-4 py-2 brutal-border flex items-center gap-3 font-black text-sm">
+                  <Smartphone className="w-5 h-5 text-neon" />
+                  MOBILE-FIRST UI
+                </div>
+              </div>
               <CompatibilityForm onSubmit={handleAnalyze} isLoading={isLoading} />
             </motion.div>
           ) : (
             <motion.div
               key="result"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0 }}
             >
               <CompatibilityResult result={result} onReset={handleReset} />
             </motion.div>
@@ -133,11 +115,15 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      {/* Footer */}
-      <footer className="py-12 border-t-4 border-brutal-black bg-neon text-brutal-black text-center">
-        <p className="font-display text-xl">
-          &copy; 2026 DESTINY ANALYZER // ALL RIGHTS RESERVED
-        </p>
+      {/* Floating Action/Status Bar */}
+      <footer className="fixed bottom-0 left-0 w-full p-6 bg-white border-t-8 border-brutal-black z-50 flex justify-between items-center">
+        <div className="font-display text-2xl tracking-tighter">DESTINY.AI</div>
+        <div className="flex gap-6">
+          <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity }} >
+            <Zap className="w-8 h-8 fill-neon" />
+          </motion.div>
+          <Sparkles className="w-8 h-8 fill-brutal-black" />
+        </div>
       </footer>
     </div>
   );

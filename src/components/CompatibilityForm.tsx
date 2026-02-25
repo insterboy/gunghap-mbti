@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserInfo } from '../services/localEngine';
-import { Heart, Sparkles, Calendar, User, ChevronRight, Zap } from 'lucide-react';
+import { Sparkles, ChevronRight, Zap, Target, User2, UserCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface CompatibilityFormProps {
@@ -17,65 +17,69 @@ const MBTI_OPTIONS = [
 
 export const CompatibilityForm: React.FC<CompatibilityFormProps> = ({ onSubmit, isLoading }) => {
   const [user1, setUser1] = useState<UserInfo>({ nickname: '', gender: '남성', birthdate: '', mbti: 'ENFP' });
-  const [user2, setUser2] = useState<UserInfo>({ nickname: '', gender: '여성', birthdate: '', mbti: 'INTJ' });
+  const [user2, setUser2] = useState<UserInfo>({ nickname: '', gender: '여성', birthdate: '', mbti: 'INFJ' });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(user1, user2);
   };
 
-  const renderUserInput = (user: UserInfo, setUser: React.Dispatch<React.SetStateAction<UserInfo>>, title: string) => (
-    <div className="space-y-6 p-8 bg-white brutal-border">
-      <h3 className="text-2xl font-display flex items-center gap-2">
-        <Zap className="w-6 h-6 text-neon fill-brutal-black" />
+  const renderUserInput = (user: UserInfo, setUser: React.Dispatch<React.SetStateAction<UserInfo>>, title: string, isMe: boolean) => (
+    <div className={`p-6 border-4 border-brutal-black ${isMe ? 'bg-white' : 'bg-brutal-black text-white'} relative overflow-hidden`}>
+      <div className={`absolute top-0 right-0 p-2 ${isMe ? 'bg-neon text-brutal-black' : 'bg-white text-brutal-black'} font-black text-[10px]`}>
+        {isMe ? 'PERSON_01' : 'PERSON_02'}
+      </div>
+
+      <h3 className="text-3xl font-display mb-8 flex items-center gap-3">
+        {isMe ? <User2 className="w-8 h-8" /> : <UserCheck className="w-8 h-8" />}
         {title}
       </h3>
-      
-      <div className="space-y-5">
+
+      <div className="space-y-6">
         <div>
-          <label className="block text-sm font-bold uppercase mb-2">Nickname</label>
+          <label className={`block text-[10px] font-black uppercase mb-2 ${isMe ? 'text-gray-500' : 'text-gray-400'}`}>Nickname</label>
           <input
             type="text"
             value={user.nickname}
             onChange={(e) => setUser({ ...user, nickname: e.target.value })}
-            className="w-full px-4 py-3 bg-white border-2 border-brutal-black focus:bg-neon focus:outline-none transition-colors font-mono font-bold"
-            placeholder="WHO ARE YOU?"
+            className={`w-full px-4 py-4 border-2 border-brutal-black focus:outline-none focus:ring-4 focus:ring-neon font-bold text-lg ${isMe ? 'bg-white text-brutal-black' : 'bg-white text-brutal-black'}`}
+            placeholder="이름이 뭐야?"
             required
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-bold uppercase mb-2">Gender</label>
+            <label className={`block text-[10px] font-black uppercase mb-2 ${isMe ? 'text-gray-500' : 'text-gray-400'}`}>MBTI</label>
+            <select
+              value={user.mbti}
+              onChange={(e) => setUser({ ...user, mbti: e.target.value })}
+              className={`w-full px-4 py-4 border-2 border-brutal-black focus:outline-none focus:ring-4 focus:ring-neon font-bold text-lg bg-white text-brutal-black appearance-none rounded-none`}
+            >
+              {MBTI_OPTIONS.map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className={`block text-[10px] font-black uppercase mb-2 ${isMe ? 'text-gray-500' : 'text-gray-400'}`}>Gender</label>
             <select
               value={user.gender}
               onChange={(e) => setUser({ ...user, gender: e.target.value })}
-              className="w-full px-4 py-3 bg-white border-2 border-brutal-black focus:bg-neon focus:outline-none transition-colors font-mono font-bold appearance-none"
+              className={`w-full px-4 py-4 border-2 border-brutal-black focus:outline-none focus:ring-4 focus:ring-neon font-bold text-lg bg-white text-brutal-black appearance-none rounded-none`}
             >
               <option>남성</option>
               <option>여성</option>
               <option>기타</option>
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-bold uppercase mb-2">MBTI</label>
-            <select
-              value={user.mbti}
-              onChange={(e) => setUser({ ...user, mbti: e.target.value })}
-              className="w-full px-4 py-3 bg-white border-2 border-brutal-black focus:bg-neon focus:outline-none transition-colors font-mono font-bold appearance-none"
-            >
-              {MBTI_OPTIONS.map(m => <option key={m} value={m}>{m}</option>)}
-            </select>
-          </div>
         </div>
 
         <div>
-          <label className="block text-sm font-bold uppercase mb-2">Birthdate</label>
+          <label className={`block text-[10px] font-black uppercase mb-2 ${isMe ? 'text-gray-500' : 'text-gray-400'}`}>Birthdate</label>
           <input
             type="date"
             value={user.birthdate}
             onChange={(e) => setUser({ ...user, birthdate: e.target.value })}
-            className="w-full px-4 py-3 bg-white border-2 border-brutal-black focus:bg-neon focus:outline-none transition-colors font-mono font-bold"
+            className={`w-full px-4 py-4 border-2 border-brutal-black focus:outline-none focus:ring-4 focus:ring-neon font-bold text-lg bg-white text-brutal-black rounded-none`}
             required
           />
         </div>
@@ -84,30 +88,35 @@ export const CompatibilityForm: React.FC<CompatibilityFormProps> = ({ onSubmit, 
   );
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-8">
-      <div className="space-y-8">
-        {renderUserInput(user1, setUser1, "ME")}
-        {renderUserInput(user2, setUser2, "SOMEBODY")}
+    <form onSubmit={handleSubmit} className="space-y-12">
+      <div className="space-y-6">
+        {renderUserInput(user1, setUser1, "ME", true)}
+        <div className="flex justify-center -my-8 relative z-20">
+          <div className="bg-neon p-4 rounded-full border-4 border-brutal-black rotate-12">
+            <Zap className="w-8 h-8 fill-brutal-black" />
+          </div>
+        </div>
+        {renderUserInput(user2, setUser2, "YOU", false)}
       </div>
 
       <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={{ x: 5 }}
+        whileTap={{ scale: 0.95 }}
         disabled={isLoading}
-        className="w-full py-6 bg-brutal-black text-white font-display text-3xl brutal-border-hover flex items-center justify-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="group relative w-full py-8 bg-neon border-4 border-brutal-black hover:bg-white transition-colors duration-300"
       >
-        {isLoading ? (
-          <>
-            <div className="w-8 h-8 border-4 border-neon border-t-transparent rounded-full animate-spin" />
-            ANALYZING...
-          </>
-        ) : (
-          <>
-            <Sparkles className="w-8 h-8 text-neon" />
-            GET RESULTS
-            <ChevronRight className="w-8 h-8" />
-          </>
-        )}
+        <div className="absolute inset-0 bg-brutal-black translate-x-2 translate-y-2 -z-10 group-active:translate-x-0 group-active:translate-y-0 transition-transform" />
+        <div className="flex items-center justify-center gap-4">
+          {isLoading ? (
+            <div className="w-10 h-10 border-4 border-brutal-black border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <>
+              <Target className="w-10 h-10" />
+              <span className="font-display text-4xl uppercase italic">운명 분석하기</span>
+              <ChevronRight className="w-10 h-10" />
+            </>
+          )}
+        </div>
       </motion.button>
     </form>
   );

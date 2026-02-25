@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Share2, Copy, Check, RefreshCw, Heart, Download, Camera } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { Share2, RefreshCw, Heart, Camera, Download, Star, Crown } from 'lucide-react';
+import { motion } from 'motion/react';
 import html2canvas from 'html2canvas';
 
 interface CompatibilityResultProps {
@@ -20,7 +20,7 @@ export const CompatibilityResult: React.FC<CompatibilityResultProps> = ({ result
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy!', err);
+      console.error('Copy failed', err);
     }
   };
 
@@ -30,43 +30,41 @@ export const CompatibilityResult: React.FC<CompatibilityResultProps> = ({ result
     try {
       const canvas = await html2canvas(resultRef.current, {
         backgroundColor: '#FFFFFF',
-        scale: 2,
+        scale: 3, // High quality for sharing
         logging: false,
         useCORS: true,
       });
       const image = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.href = image;
-      link.download = `compatibility-result-${Date.now()}.png`;
+      link.download = `DESTINY-RESULT-${Date.now()}.png`;
       link.click();
     } catch (err) {
-      console.error('Capture failed!', err);
+      console.error('Capture failed', err);
     } finally {
       setIsCapturing(false);
     }
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-3xl mx-auto space-y-12"
-    >
-      <div 
+    <div className="space-y-10 pb-12">
+      <div
         ref={resultRef}
-        className="bg-white brutal-border p-8 md:p-12 relative overflow-hidden"
+        className="bg-white border-8 border-brutal-black p-6 md:p-10 relative overflow-hidden shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]"
       >
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-neon border-l-2 border-b-2 border-brutal-black -mr-16 -mt-16 rotate-45" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-neon border-t-2 border-r-2 border-brutal-black -ml-12 -mb-12 rotate-45" />
+        {/* Decorative corner tags */}
+        <div className="absolute top-0 right-0 bg-brutal-black text-neon px-4 py-1 font-black text-[10px] uppercase tracking-widest">
+          Authentic Analysis
+        </div>
 
         <div className="relative">
-          <div className="flex justify-between items-start mb-12">
-            <div className="bg-brutal-black text-neon px-4 py-2 font-display text-xl">
-              TOP SECRET ANALYSIS
+          <div className="flex items-center gap-4 mb-10 border-b-4 border-brutal-black pb-6">
+            <div className="bg-neon p-3 border-4 border-brutal-black">
+              <Star className="w-8 h-8 fill-brutal-black" />
             </div>
-            <div className="font-mono text-xs font-bold uppercase">
-              ID: {Math.random().toString(36).substring(7).toUpperCase()}
+            <div>
+              <h2 className="text-4xl font-display uppercase leading-none">Result Report</h2>
+              <p className="font-mono text-[10px] font-black opacity-50 uppercase mt-1">Serial No. #XYZ-2026</p>
             </div>
           </div>
 
@@ -74,52 +72,54 @@ export const CompatibilityResult: React.FC<CompatibilityResultProps> = ({ result
             <ReactMarkdown>{result}</ReactMarkdown>
           </div>
 
-          <div className="mt-12 pt-8 border-t-2 border-dashed border-brutal-black flex justify-between items-center">
-            <div className="font-display text-2xl">COMPATIBILITY COMPLETE</div>
-            <Heart className="w-8 h-8 text-brutal-black fill-neon" />
+          <div className="mt-12 pt-8 border-t-8 border-double border-brutal-black flex justify-between items-center">
+            <div className="font-display text-3xl italic tracking-tighter">PERFECT SYNC</div>
+            <div className="flex gap-2">
+              <Heart className="w-8 h-8 text-brutal-black fill-neon" />
+              <Crown className="w-8 h-8 text-brutal-black fill-none" />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <button
-          onClick={handleCopy}
-          className="flex items-center justify-center gap-2 px-6 py-4 bg-white brutal-border brutal-border-hover font-bold uppercase text-sm"
-        >
-          {copied ? (
-            <>
-              <Check className="w-5 h-5 text-green-600" />
-              <span>COPIED!</span>
-            </>
-          ) : (
-            <>
-              <Share2 className="w-5 h-5" />
-              <span>COPY LINK</span>
-            </>
-          )}
-        </button>
-
+      <div className="grid grid-cols-1 gap-4 px-2">
         <button
           onClick={handleCapture}
           disabled={isCapturing}
-          className="flex items-center justify-center gap-2 px-6 py-4 bg-neon brutal-border brutal-border-hover font-bold uppercase text-sm disabled:opacity-50"
+          className="group relative flex items-center justify-center gap-4 py-6 bg-brutal-black text-white brutal-border-hover disabled:opacity-50"
         >
           {isCapturing ? (
-            <div className="w-5 h-5 border-2 border-brutal-black border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
-            <Camera className="w-5 h-5" />
+            <>
+              <Camera className="w-8 h-8 text-neon" />
+              <span className="font-display text-3xl uppercase">결과 이미지 저장</span>
+            </>
           )}
-          <span>{isCapturing ? 'CAPTURING...' : 'SAVE IMAGE'}</span>
         </button>
 
-        <button
-          onClick={onReset}
-          className="flex items-center justify-center gap-2 px-6 py-4 bg-brutal-black text-white brutal-border brutal-border-hover font-bold uppercase text-sm"
-        >
-          <RefreshCw className="w-5 h-5" />
-          <span>RETRY</span>
-        </button>
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            onClick={handleCopy}
+            className="flex items-center justify-center gap-3 py-5 bg-neon border-4 border-brutal-black font-black uppercase text-sm brutal-border-hover"
+          >
+            {copied ? <Download className="w-5 h-5" /> : <Share2 className="w-5 h-5" />}
+            {copied ? 'COPIED!' : 'LINK COPY'}
+          </button>
+
+          <button
+            onClick={onReset}
+            className="flex items-center justify-center gap-3 py-5 bg-white border-4 border-brutal-black font-black uppercase text-sm brutal-border-hover"
+          >
+            <RefreshCw className="w-5 h-5" />
+            RETRY
+          </button>
+        </div>
       </div>
-    </motion.div>
+
+      <div className="text-center font-mono text-[10px] font-black opacity-30 mt-8">
+        CAPTURED BY DESTINY.AI // NO SERVER LOGS SAVED
+      </div>
+    </div>
   );
 };
